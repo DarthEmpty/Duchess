@@ -1,0 +1,53 @@
+Every time it's a player's go, they go through 4 different stages:
+ - The Draw Stage
+ - The Tribute Stage
+ - The Play Stage
+ - The Battle Stage
+Any of these stages can be skipped during the player's go.
+
+
+Draw Stage:
+
+The player always starts their go by drawing a card from the top of their deck and adding it to their hand. That card, like all the other cards in the player's hand, can then be played to the field during the Play Stage.
+A card drawn while the player has 7 cards in their hand must instantly be sent to their grave - 7 is the maximum capacity of a player's hand.
+
+
+Tribute Stage:
+
+After the player has drawn a card from their deck, the tribute stage begins. A player is allowed to tribute cards from their field by sending them to the grave. Depending on how many cards are tributed, the player is then allowed to play certain cards. The required number of tributes for each card is listed below:
+
+ - No tributes are needed to play a card with a rank from Ace to 5.
+ - 1 tribute is needed to play a card with a rank from 6 to 10.
+ - 2 tributes are needed to play a card with a rank from Jack to King.
+
+Once the player's deck is empty, the player is allowed to tribute cards from their hand as well. Only a maximum of 2 tributes are allowed per turn and cards tributed on one turn can't be used to play a card another turn. Cards can't be tributed in the same go that they're played in. Tributing can't happen after a card is played unless the card played is an 8.
+
+
+Play Stage:
+
+After the player has tributed the necessary number of cards, the play stage begins. A player is able to play cards by sending them from their hand to the field. Certain cards have various affects on the game when they are played, the details of which are described below:
+
+ - A 2 will cause all other players to draw a card from their respective decks.
+ - A 7 will cause all other players to send the top card of their remaining deck to the grave.
+ - An 8 will cause the player's go to be reset. Specifically, they'll be allowed to tribute and play more cards as if their go hadn't already started.
+ - A Jack will allow the player to revive a card of their choice, sending it from the grave to their field.
+ - A Queen will allow the player to rescue a card of their choice, sending it from the grave to their hand.
+ - A King will allow the player to reset a card of their choice, sending it from the grave to their deck. The deck must be shuffled after this happens.
+
+Only one card is allowed to be played per go unless the card played is an 8. Cards with effects must activate these effects immediately after they've been played and never more afterwards. A card cannot be played if the player's field has 5 cards in it - 5 is the maximum capacity of the field.
+
+
+Battle Stage:
+
+After the player has played the card they wanted, the battle stage begins. A player is able to battle cards by selecting a card on their field and another one on their opponent's field and comparing their values and their ranks. Comparison goes as follows:
+
+ - The card of the player taking their turn is the attacking card, the other card is the defending card.
+ - Aces are low (worth 1) if they're an attacking card but high (worth 14) if they're a defending card.
+ - Kings are worth 13, Queens are worth 12 and Jacks are worth 11.
+ - The attacking card can defeat the defending card through either rank or suit. "Death by rank" should always be considered before "Death by suit".
+    -- In most battles, the highest rank wins. e.g. if an attacking 5 battled a defending 3, the 5 would win since 5 is more than 3.
+    -- If the attacking card's rank is lower than that of the defending card, the attacking card can attack using its suit. Diamonds beat Clubs, Clubs beat Hearts, Hearts beat Spades and Spades beat Diamonds.
+(To help you remember, think of the name of the game: Duchess. The first letter of each suit is used in the name in the order of which they beat each other (D u C H e S s)).
+ - The attacking card is not allowed to be defeated by the defending card. If there's a time where this would happen, the battle is cancelled and the attacking card must choose a new target.
+
+Only one card can battle per go and that card can only battle one other card.
