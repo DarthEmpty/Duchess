@@ -11,22 +11,16 @@ SPECIAL_RANKS = ("2", "7", "8", "J", "Q", "K")
 class DuchCard(CardGame.Card):
     """A card object for Duchess consisting of a rank, a suit and the ability to battle."""
 
+    # Constructor
     def __init__(self, rank, suit):
         super().__init__(rank, suit)
-        self._battled = False
         self._destroyed = False
 
     # Getters
-    def hasBattled(self):
-        return self._battled
-
     def isDestroyed(self):
         return self._destroyed
 
     # Setters
-    def setBattled(self, boolean):
-        self._battled = boolean
-
     def setDestroyed(self, boolean):
         self._destroyed = boolean
 
@@ -34,6 +28,7 @@ class DuchCard(CardGame.Card):
 class SpecialDuchCard(DuchCard):
     """An enhanced DuchCard object with an ability unique to its rank."""
 
+    # Constructor
     def __init__(self, rank, suit):
         super().__init__(rank, suit)
         self._active = True
@@ -53,6 +48,7 @@ class DuchDeck(CardGame.Deck):
     # Methods
     def populate(self, jokers=False):
         """Fills the DuchDeck with the complete list of 52 cards (54 if jokers = true)."""
+
         for i in CardGame.RANKS:
             for j in CardGame.SUITS:
                 if i in SPECIAL_RANKS:
@@ -70,6 +66,7 @@ class Hand(CardGame.CardPile):
     """The place where DuchCards are played from.
     'capacity' must be an integer."""
 
+    # Constructor
     def __init__(self, capacity):
         super().__init__()
         self._CAPACITY = capacity
@@ -88,6 +85,7 @@ class Field(Hand):
     """The place where DuchCards are played.
     'capacity' must be an integer."""
 
+    # Constructor
     def __init__(self, capacity):
         super().__init__(capacity)
         self._tributes = 0
@@ -120,10 +118,7 @@ class Battlefield(CardGame.CardPile):
         defence_rank = self._cards[1].getRank()[-1]
 
         if attack_rank > defence_rank:
-            # Destroy defending card
-            self._cards[0].setBattled(True)
-            self._cards[1].setBattled(True)
-            self._cards[1].setDestroyed(True)
+            self._cards[1].setDestroyed(True)  # Destroys defending card
 
         return attack_rank > defence_rank
 
@@ -144,16 +139,14 @@ class Battlefield(CardGame.CardPile):
             n = -1  # Allows spades to beat diamonds
 
         if defence_suit == CardGame.SUITS[n + 1]:
-            # Destroy defending card
-            self._cards[0].setBattled(True)
-            self._cards[1].setBattled(True)
-            self._cards[1].setDestroyed(True)
+            self._cards[1].setDestroyed(True)  # Destroy defending card
 
         return defence_suit == CardGame.SUITS[n + 1]
 
     def battleCards(self):
         """Compares the ranks of two battlinng cards. Will only compare the suits
         if the rank battle fails. If the attacking card doesn't win, ther is no battle."""
+
         if not self.battleRanks():  # Conducts rank battle
             return self.battleSuits()  # Conducts suit battle if rank battle fails
         return True
@@ -161,8 +154,10 @@ class Battlefield(CardGame.CardPile):
 
 class Player(object):
     """An abstraction of the user, allowing a human to interact with the system and play the game.
-    The player object consists of a deck, hand, field and a grave."""
+    The player object consists of a deck, hand, field and a grave as well as a name and 'played' and 'battled' flags.
+    'name' must be a String."""
 
+    # Constructor
     def __init__(self, name):
         self._name = name  # The player's name
         self._deck = DuchDeck()  # Where player draws from
@@ -173,6 +168,7 @@ class Player(object):
         self._played = False  # flag to say if the player has played a card this turn
         self._battled = False  # flag to say if the player has battled this turn
 
+    # toString
     def __str__(self):
         name = "\nName: " + self._name
         field = "\nField: " + str(self._field)
@@ -223,45 +219,44 @@ class Player(object):
     # Methods
     def reset(self):
         """Restarts the player's go. """
+
         self._field.resetTributes()
         self._played = False
         self._battled = False
-
-        cards = self._field.getCards()
-        for card in cards:
-            if card.hasBattled():
-                card.setBattled(False)
-        self._field.setCards(cards)
 
     def burn(self):
         """Destroys the top card of the player's deck, burning the card."""
         self._deck.getCards()[0].setDestroyed(True)
 
     def bury(self, source, card_pos=0):
-        """Moves a destroyed card from its source to the player's grave.
+        """Moves a card from its source to the player's grave.
+        The first card in a CardPile is buried by default.
         'card_pos' must be an integer referring to the position of the card to be buried.
         'source' must be the CardPile object that card is in."""
         source.sendCard(self._grave, card_pos)
 
     def draw(self):
-        """Sends a card from the top of the player's deck to their hand if the game isn't
-        just starting. Otherwise, the player's first 5 cards are dealt to them."""
+        """Sends a card from the top of the player's deck to their hand if the game isn't just starting.
+        Otherwise, the player's first 5 cards are dealt to them."""
+
         if self._hand.isEmpty() and self._field.isEmpty() and self._grave.isEmpty():
             self._deck.deal(self._hand, 5)
         elif not self._deck.isEmpty():
             self._deck.sendCard(self._hand)
 
     def tribute(self, source, card_pos):
-        """Destroys a card in the player's CardPile, tributing the card.
+        """Destroys and buries a card in the player's CardPile, tributing the card.
         'source' must be either the player's hand or field.
         'card_pos' must be an integer referring to the position of the card to be tributed."""
+
         source.getCards()[card_pos].setDestroyed(True)
         self.bury(source, card_pos)
         self._field.incrementTributes()
 
     def play(self, card_pos):
         """Sends a card from the player's hand to their field, playing the card.
-        'old_card_pos' must be an integer referring to the position of the card to be sent."""
+        'card_pos' must be an integer referring to the position of the card to be sent."""
+
         self._hand.sendCard(self._field, card_pos)
         self._played = True  # Tells the player object that a card has been played
         self._field.resetTributes()
@@ -291,6 +286,8 @@ class Player(object):
         self._battlefield.sendCard(self._field, 0, atk_card_pos)
 
     def menuIO(self):
+        """Asks the user what they want to do during their go."""
+
         choice = DuchIO.ask(str(self)
                             + "\nEnter:\n"
                             + "\t1 - Tribute\n"
@@ -302,6 +299,8 @@ class Player(object):
         return choice
 
     def overflowIO(self):
+        """Asks the user about which card they wish to get rid of since their hand is full."""
+
         choice = DuchIO.ask("\nYour hand:\n"
                             + str(self._hand)
                             + "\nYour hand is too full"
@@ -310,6 +309,9 @@ class Player(object):
         return choice
 
     def tributeIO(self):
+        """Asks the user about which card they wish to tribute.
+        Will ask if they want to tribute from the hand if their deck is empty."""
+
         choice = ""
 
         if self._deck.isEmpty():
@@ -330,6 +332,8 @@ class Player(object):
         return choice, source
 
     def playIO(self):
+        """Asks the user about which card they wish to play."""
+
         choice = DuchIO.ask("\nYour hand:\n"
                             + str(self._hand)
                             + "\nEnter the number of the card you want to play"
@@ -338,6 +342,8 @@ class Player(object):
         return choice
 
     def battleIO(self, opponent):
+        """Asks the user about which of their cards and their opponents cards they want to battle."""
+
         atk_card_pos = DuchIO.ask("\nYour Field:\n"
                                   + str(self._field)
                                   + "\nEnter the number of the card you want "
@@ -356,9 +362,16 @@ class Player(object):
         return "c", "c"
 
     def go(self, progress="", opponent=None):
+        """Takes the user through a series of other methods organised in such a way that allows them to have a turn
+        in the game.
+        Allows the Player to be in communication with the Playground object that it's in so that, based on its
+        parameters, it can start at different places.
+        'progress' must be a string.
+        'opponent' must be a Player object."""
+
         choice = ""  # Stores the user's choice
 
-        # Start of go preparations
+        # "Start of go" preparations
         if not progress:
             self.draw()
             self.reset()
@@ -370,9 +383,11 @@ class Player(object):
                 self.bury(self._hand, int(choice) - 1)
                 choice = ""
 
+        # Continuation of battle stage
         elif progress == "battling":
             choice = "3"
 
+        # Player's main loop
         while choice != "q":
             # Menu
             if not choice:
@@ -397,16 +412,14 @@ class Player(object):
                     DuchIO.notify("\nYour field is too full to play anymore cards right now.")
                 else:
                     choice = self.playIO()
-
                     if choice != "c":
                         tributes = self._field.getTributes()
                         card_rank = self._hand.getCards()[int(choice) - 1].getRank()[0]
-
                         if ((tributes == 0 and card_rank < 6) or
                                 (tributes == 1 and card_rank < 11) or
                                     tributes == 2):
                             self.play(int(choice) - 1)
-                            return "playing", None
+                            return "playing", None  # Tells Playground that Player has just played a card
                         else:
                             DuchIO.notify("\nYou can't do that. Please tribute more cards.")
 
@@ -416,7 +429,7 @@ class Player(object):
                     DuchIO.notify("\nYou've already battled cards this turn.")
                 elif self._field.isEmpty():
                     DuchIO.notify("\nYou field is empty. Play a card if you want to battle it.")
-                elif opponent:
+                elif opponent:  # From playground
                     atk_card_pos, def_card_pos = self.battleIO(opponent)
                     if def_card_pos != "c":
                         self.battle(opponent, int(atk_card_pos) - 1, int(def_card_pos) - 1)
@@ -424,54 +437,57 @@ class Player(object):
                             DuchIO.notify("\nTarget destroyed!")
                         else:
                             DuchIO.notify("\nPlease choose appropriate cards to battle.")
-                    return "battle complete", opponent
+                    return "battle complete", opponent  # Tells playground that Player is done battling
                 else:
-                    return "battling", None
+                    return "battling", None  # Request to Playground for opponent
 
             # Viewing fields
             elif choice == "4":
-                return "viewing", None
+                return "viewing", None  # Request to Playground for opponents' fields
 
             # Reset choice to go back to the menu
             if choice != "q":
                 choice = ""
 
-        return "done", None
+        return "done", None  # Tells Playground that Player is done with their go
 
 
 class Playground(object):
     """The place where Duchess is hosted. Players interact here.
     The control of the flow of the game is delegated to the playground."""
 
+    # Constructor
     def __init__(self, *players):
         # Creating the attribute objects
-        self._players = list(players)
-        self._losers = []
-        self._turnPlayer = 0
+        self._players = list(players)  # Where the players are stored
+        self._losers = []  # Where players that have lost are stored
+        self._turnPlayer = 0  # Indicator stating who's turn it is
 
         # Creating and shuffling the master deck
         master = DuchDeck()
         master.populate()
         master.shuffle()
 
-        cardTotal = len(master.getCards())
-        playerTotal = len(self._players)
+        card_total = len(master.getCards())
+        player_total = len(self._players)
 
         # Distributing the cards between players
         for player in self._players:
             deck = player.getDeck()
-            master.deal(deck, 2) # int(cardTotal / playerTotal))
+            master.deal(deck, int(card_total / player_total))
             deck.shuffle()
             player.setDeck(deck)
             player.draw()
 
+    # Methods
     def getOpponents(self):
+        """Creates a list of opponents and options to choose from for the turnPlayer."""
         options = ""
         opponents = ""
         n = 0
 
         while n < len(self._players):
-            if n != self._turnPlayer:
+            if n != self._turnPlayer:  # Ensures turnPlayer is ignored
                 opponents += "\n" + self._players[n].getName() + "[" + str(n + 1) + "]" \
                              + "\n" + str(self._players[n].getField()) + "\n"
                 options += str(n + 1)
@@ -480,8 +496,12 @@ class Playground(object):
         return opponents, options
 
     def royalIO(self, rank):
+        """Asks the user about which of their cards in their grave they want to revive, rescue or reset.
+        'rank' must be an integer between 11 and 13 inclusive."""
+
         player = self._players[self._turnPlayer]
 
+        # Determine action depending on rank
         if rank == 11:
             action = "revive"
         elif rank == 12:
@@ -497,12 +517,16 @@ class Playground(object):
         return int(choice) - 1
 
     def opponentIO(self):
+        """Asks the user about which opponent they wish to do battle with."""
+
         opponents, options = self.getOpponents()
         choice = DuchIO.ask(opponents + "\nEnter the number of the player you wish to battle with\n",
                             options + "c")
         return choice
 
     def twoEffect(self):
+        """Causes all opponents of the turnPlayer to draw a card from their respective decks."""
+
         n = 0
         while n < len(self._players):
             if n != self._turnPlayer:
@@ -511,6 +535,8 @@ class Playground(object):
         DuchIO.notify("\nAll other players draw a card!")
 
     def sevenEffect(self):
+        """Causes all opponents of the turnPlayer to burn the top card of their respective decks."""
+
         n = 0
         while n < len(self._players):
             if n != self._turnPlayer and not self._players[n].getDeck().isEmpty():
@@ -520,15 +546,22 @@ class Playground(object):
         DuchIO.notify("\nAll other players burn the top card of their deck!")
 
     def eightEffect(self):
+        """Causes the turnPlayer's go to restart."""
+
         self._players[self._turnPlayer].reset()
         DuchIO.notify("\nYour go starts again!")
 
     def royalEffect(self, rank):
+        """Allows the turnPlayer to revive, rescue or reset a card from their grave,
+        depending on the value of 'rank'.
+        'rank' must be an integer between 11 and 13 inclusive."""
+
         grave = self._players[self._turnPlayer].getGrave()
         cards = grave.getCards()
 
         card_pos = self.royalIO(rank)
 
+        # Determine where the card will be sent to
         if rank == 11:
             source = self._players[self._turnPlayer].getField()
         elif rank == 12:
@@ -536,7 +569,7 @@ class Playground(object):
         else:
             source = self._players[self._turnPlayer].getDeck()
 
-        cards[card_pos].setBattled(False)
+        # Bring the card back to life
         cards[card_pos].setDestroyed(False)
         if cards[card_pos].getStringRank() in SPECIAL_RANKS:
             cards[card_pos].setActive(True)
@@ -555,6 +588,9 @@ class Playground(object):
             self._players[self._turnPlayer].setDeck(source)
 
     def trigger(self):
+        """Handles the activation of SpecialDuchCard abilities, activating them once the card in question has been
+        played."""
+
         cards = self._players[self._turnPlayer].getField().getCards()
 
         for card in cards:
@@ -574,6 +610,12 @@ class Playground(object):
         self._players[self._turnPlayer].getField().setCards(cards)
 
     def turn(self):
+        """Allows the turnPlayer to have their turn in the Playground, alerting them about it at the start of it
+        and progressing on to the next player at the end.
+        Allows the Playground to be in communication with each Player object that it has so that, based on its
+        parameters, the Player can start at different places.
+        """
+
         player = self._players[self._turnPlayer]
         progress = ""
         opponent = None
@@ -583,7 +625,7 @@ class Playground(object):
 
         # Let them have their go
         while progress != "done":
-            progress, opponent = player.go(progress, opponent)
+            progress, opponent = player.go(progress, opponent)  # variables set up for requests and notifications
 
             # if they play a SpecialDuchCard, trigger its effect immediately
             if progress == "playing":
@@ -592,12 +634,12 @@ class Playground(object):
             # if they wish to battle, let them choose their opponent
             elif progress == "battling":
                 if len(self._players) == 2:
-                    choice = self._turnPlayer # will always select other player as opponent
+                    choice = self._turnPlayer
                 else:
                     choice = self.opponentIO()
 
                 if choice != "c":
-                    opponent = self._players[int(choice) - 1]
+                    opponent = self._players[int(choice) - 1]  # will always select other player as opponent
                 else:
                     progress = "cancel"
 
@@ -622,6 +664,8 @@ class Playground(object):
         self._turnPlayer += 1
 
     def start(self):
+        """Begins the mainloop of Duchess. Continues until a there's only one player that hasn't lost."""
+
         while len(self._players) != 1:
             self.turn()
             os.system("cls")
