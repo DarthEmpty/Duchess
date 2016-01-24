@@ -60,8 +60,10 @@ Comparison goes as follows:
  - Kings are worth 13, Queens are worth 12 and Jacks are worth 11.
  - The attacking card can defeat the defending card through either rank or suit. "Death by rank" should always be considered before "Death by suit".
     -- In standard battles, the highest rank wins. e.g. if an attacking 5 battled a defending 3, the 5 would win since 5 is more than 3.
-    -- If the attacking card's rank is lower than that of the defending card, the attacking card can attack using its suit. Diamonds beat Clubs, Clubs beat Hearts, Hearts beat Spades and Spades beat Diamonds.
+    -- If the attacking card's rank is lower than that of the defending card, the attacking card can attack using its suit.
+        Diamonds beat Clubs, Clubs beat Hearts, Hearts beat Spades and Spades beat Diamonds.
 (To help you remember, think of the name of the game: Duchess. The first letter of each suit is used in the name in the order of which they beat each other (D u C H e S s)).
- - The attacking card is not allowed to be defeated by the defending card. If there's a time where this would happen, the battle is cancelled and the attacking card must choose a new target.
+ - The attacking card is not allowed to be defeated by the defending card.
+    If there's a time where this would happen, the battle is cancelled and the attacking card must choose a new target.
 
 Only one card can battle per go and that card can only battle one other card.
