@@ -25,13 +25,13 @@ class Card(object):
         if self._rank == "A":
             return 1, 14  # Both values of Ace are returned
         elif self._rank == "J":
-            return tuple(11)  # Tuple form because of Ace's values
+            return 11,  # Tuple form because of Ace's values
         elif self._rank == "Q":
-            return tuple(12)
+            return 12,
         elif self._rank == "K":
-            return tuple(13)
+            return 13,
         else:
-            return tuple(int(self._rank))
+            return int(self._rank),
 
     def getStringRank(self):
         """Returns a string of the rank of the card object"""

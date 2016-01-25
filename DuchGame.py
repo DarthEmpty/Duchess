@@ -95,9 +95,10 @@ class Field(Hand):
         return self._tributes
 
     # Methods
-    def incrementTributes(self):
-        """Increases the number of tributes by 1."""
-        self._tributes += 1
+    def incrementTributes(self, amount):
+        """Increases the number of tributes by amount.
+        'amount' must be an integer."""
+        self._tributes += amount
 
     def resetTributes(self):
         """Reduces the number of tributes to 0."""
@@ -249,9 +250,17 @@ class Player(object):
         'source' must be either the player's hand or field.
         'card_pos' must be an integer referring to the position of the card to be tributed."""
 
-        source.getCards()[card_pos].setDestroyed(True)
+        cards = source.getCards()
+        cards[card_pos].setDestroyed(True)
+
+        if cards[card_pos].getRank() <= 5:
+            tributes = 1
+        else:
+            tributes = 2
+
+        source.setCards(cards)
         self.bury(source, card_pos)
-        self._field.incrementTributes()
+        self._field.incrementTributes(tributes)
 
     def play(self, card_pos):
         """Sends a card from the player's hand to their field, playing the card.
@@ -670,3 +679,5 @@ class Playground(object):
             self.turn()
             os.system("cls")
         DuchIO.notify("\n" + self._players[0].getName() + " has won!")
+
+Playground(Player("a"), Player("b")).start()
