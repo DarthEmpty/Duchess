@@ -466,7 +466,7 @@ class Playground(object):
     The control of the flow of the game is delegated to the playground."""
 
     # Constructor
-    def __init__(self, *players):
+    def __init__(self, players):
         # Creating the attribute objects
         self._players = list(players)  # Where the players are stored
         self._losers = []  # Where players that have lost are stored
@@ -680,4 +680,13 @@ class Playground(object):
             os.system("cls")
         DuchIO.notify("\n" + self._players[0].getName() + " has won!")
 
-Playground(Player("a"), Player("b")).start()
+n = int(DuchIO.ask("How many players are playing Duchess?\n", "1234"))
+os.system("cls")
+
+players = []
+for i in range(n):
+    temp = Player(input("What is player " + str(i + 1) + "'s name?\n"))
+    players.append(temp)
+    os.system("cls")
+
+Playground(players).start()

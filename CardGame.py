@@ -1,4 +1,4 @@
-# extrnal modules
+# external modules
 from random import randint
 
 # global constants
