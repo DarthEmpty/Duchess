@@ -1,7 +1,7 @@
 # external modules
 import os
-import CardGame
-import DuchIO
+from v1 import CardGame
+from v1 import DuchIO
 
 # global constants
 SPECIAL_RANKS = ("2", "7", "8", "J", "Q", "K")
